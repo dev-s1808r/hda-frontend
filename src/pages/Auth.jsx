@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "../api/auth/login";
-import { register } from "../api/auth/register";
 import { useNavigate } from "react-router-dom";
 import {
   TextField,
@@ -13,7 +12,15 @@ import {
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true); // Toggle between Login and Register
+  const [loggedInUser, setLoggedInUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loggedInUser) {
+      navigate("/");
+    }
+    setLoggedInUser(null);
+  }, [loggedInUser]);
 
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
@@ -26,8 +33,8 @@ function Auth() {
 
     try {
       const user = await login(data);
-      console.log("User authenticated:", user);
-      navigate("/");
+      console.log(user);
+      setLoggedInUser(user);
     } catch (error) {
       console.error("Error during authentication:", error);
       alert(error);
