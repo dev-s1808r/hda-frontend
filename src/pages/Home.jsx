@@ -19,7 +19,6 @@ function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const removeUser = useAppStore.getState().removeUser;
-  // const user = useAppStore.getState().removeUser;
 
   const { refetchCurrentUser, userDetails } = useUpdateUserInfo(user.id);
 
@@ -27,8 +26,6 @@ function Home() {
     removeUser();
     navigate("/login");
   }
-
-  console.log("home reached");
 
   const handleMarkCompleted = async (id) => {
     alert(id);

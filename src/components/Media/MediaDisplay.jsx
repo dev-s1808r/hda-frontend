@@ -21,6 +21,8 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { api } from "../../api/instance";
 import useOneMedia from "../../api/data/oneMedia";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const MediaDisplay = ({
   handleMarkCompleted,
@@ -181,19 +183,27 @@ const MediaDisplay = ({
   // 🔴 Loop video between start and end timestamps when modal is open
   useEffect(() => {
     if (modalOpen && videoRef.current) {
-      videoRef.current.currentTime = selectedTimestamp.start;
-      videoRef.current.loop = true;
+      // Ensure timestamps are valid numbers
+      const start = parseFloat(selectedTimestamp.start);
+      const end = parseFloat(selectedTimestamp.end);
 
-      const loopInterval = setInterval(() => {
-        if (
-          videoRef.current.currentTime < selectedTimestamp.start ||
-          videoRef.current.currentTime >= selectedTimestamp.end
-        ) {
-          videoRef.current.currentTime = selectedTimestamp.start;
-        }
-      }, 500);
+      if (!isNaN(start) && !isNaN(end) && start >= 0 && end > start) {
+        videoRef.current.currentTime = start;
+        videoRef.current.loop = true;
 
-      return () => clearInterval(loopInterval);
+        const loopInterval = setInterval(() => {
+          if (
+            videoRef.current.currentTime < start ||
+            videoRef.current.currentTime >= end
+          ) {
+            videoRef.current.currentTime = start;
+          }
+        }, 500);
+
+        return () => clearInterval(loopInterval);
+      } else {
+        console.warn("Invalid timestamps: ", selectedTimestamp);
+      }
     }
   }, [modalOpen, selectedTimestamp]);
 
@@ -272,12 +282,11 @@ const MediaDisplay = ({
         )}
       </Box>
 
-      <Box>
-        merges
+      {/* <Box>
         {formData?.timeStamp?.map((c) => {
           return <p key={c.content}>{c.content}</p>;
         })}
-      </Box>
+      </Box> */}
 
       {(formData.mediaType === "audios" || formData.mediaType === "videos") && (
         <TableContainer component={Paper} sx={{ mt: 2 }}>
@@ -318,25 +327,17 @@ const MediaDisplay = ({
                   <TableCell>{formatTime(time.startTime)}</TableCell>
                   <TableCell>{formatTime(time.endTime)}</TableCell>
                   <TableCell>
-                    <TextField
-                      fullWidth
-                      value={time.content}
+                    <div
+                      dangerouslySetInnerHTML={{ __html: time.content }}
                       onClick={() =>
-                        handleContentClick(
-                          index,
-                          time.content,
-                          time.startTime,
-                          time.endTime
-                        )
+                        editable && handleContentClick(index, time.content)
                       }
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                      sx={{
+                      style={{
                         cursor: editable ? "pointer" : "not-allowed",
-                        "&:hover": editable
-                          ? { backgroundColor: "#f0f0f0" }
-                          : {},
+                        padding: "8px",
+                        borderRadius: "4px",
+                        border: editable ? "1px solid #ddd" : "none",
+                        backgroundColor: editable ? "#f9f9f9" : "transparent",
                       }}
                     />
                   </TableCell>
@@ -368,7 +369,7 @@ const MediaDisplay = ({
         </TableContainer>
       )}
 
-      {/* 🔴 Modal for Editing Content */}
+      {/* 🔴 Modal for Editing Content (ReactQuill for Rich Text Editing) */}
       <Modal
         open={modalOpen}
         onClose={handleModalClose}
@@ -381,7 +382,7 @@ const MediaDisplay = ({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 400,
+            width: 800,
             bgcolor: "background.paper",
             border: "2px solid #000",
             boxShadow: 24,
@@ -392,18 +393,27 @@ const MediaDisplay = ({
           <Typography id="edit-content-modal" variant="h6" sx={{ mb: 2 }}>
             Edit Transcription Content
           </Typography>
-          <TextField
-            fullWidth
-            multiline
-            minRows={4}
+          <ReactQuill
             value={selectedContent}
-            onChange={(e) => setSelectedContent(e.target.value)}
+            onChange={setSelectedContent}
+            modules={{
+              toolbar: [
+                [{ header: "1" }, { header: "2" }, { font: [] }],
+                [{ size: ["small", false, "large", "huge"] }],
+
+                [{ list: "ordered" }, { list: "bullet" }],
+                ["bold", "italic", "underline", "strike", "blockquote"],
+                [{ align: [] }],
+                [{ color: [] }, { background: [] }],
+                ["clean"],
+              ],
+            }}
           />
           <Box
             sx={{
               display: "flex",
               justifyContent: "space-between",
-              mt: 3,
+              mt: 4,
             }}
           >
             <Button

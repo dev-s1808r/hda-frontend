@@ -27,6 +27,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 import useMediaForVerification from "../api/data/mediaForVerification";
+import ReactQuill from "react-quill";
 
 const MediaTabs = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -217,585 +218,6 @@ const MediaTable = ({ mediaType }) => {
   );
 };
 
-// const MediaDisplay = ({ media, handleClose }) => {
-//   const [editable, setEditable] = useState(false);
-//   const [formData, setFormData] = useState({ ...media });
-
-//   // ✅ Ensures media updates when a new row is clicked
-//   useEffect(() => {
-//     setFormData({ ...media, timeStamp: media.timeStamp || [] });
-//   }, [media]);
-
-//   // Handle verifying the media
-//   async function handleVerify() {
-//     try {
-//       await api.patch("/media/mark-verified", { mediaId: media._id });
-//       window.location.reload();
-//     } catch (error) {
-//       console.error("Error verifying media:", error);
-//     }
-//   }
-
-//   // Handle saving the updated media data
-//   async function handleSave() {
-//     try {
-//       let response = await api.patch("/media/update-media", {
-//         mediaId: media._id,
-//         formData,
-//       });
-//       setFormData(response.data.updatedMedia);
-//       setEditable(false);
-//     } catch (error) {
-//       console.error("Error saving media:", error);
-//     }
-//   }
-
-//   // Handle changes to form inputs
-//   const handleChange = (e) => {
-//     setFormData({ ...formData, [e.target.name]: e.target.value });
-//   };
-
-//   // Handle changes in timestamp fields
-//   const handleTimestampChange = (index, field, value) => {
-//     let updatedTimestamps = [...formData.timeStamp];
-//     updatedTimestamps[index][field] = value;
-//     setFormData({ ...formData, timeStamp: updatedTimestamps });
-//   };
-
-//   // Add a new timestamp entry
-//   const addTimestampRow = () => {
-//     setFormData({
-//       ...formData,
-//       timeStamp: [
-//         ...formData.timeStamp,
-//         { startTime: "", endTime: "", content: "" },
-//       ],
-//     });
-//   };
-
-//   // Remove a timestamp entry
-//   const removeTimestampRow = (index) => {
-//     let updatedTimestamps = [...formData.timeStamp];
-//     updatedTimestamps.splice(index, 1);
-//     setFormData({ ...formData, timeStamp: updatedTimestamps });
-//   };
-
-//   return (
-//     <Box sx={{ p: 2, border: "1px solid #ccc", borderRadius: 2, mb: 2 }}>
-//       {/* Header with Edit, Save, Close Buttons */}
-//       <Box
-//         sx={{
-//           display: "flex",
-//           justifyContent: "space-between",
-//           alignItems: "center",
-//         }}
-//       >
-//         <Typography variant="h6">
-//           {editable ? "Edit Media" : "Media Details"}
-//         </Typography>
-//         <Box>
-//           {editable ? (
-//             <IconButton onClick={handleSave}>
-//               <SaveIcon color="primary" />
-//             </IconButton>
-//           ) : (
-//             <IconButton onClick={() => setEditable(true)}>
-//               <EditIcon />
-//             </IconButton>
-//           )}
-//           <IconButton onClick={handleClose}>
-//             <CloseIcon />
-//           </IconButton>
-//         </Box>
-//       </Box>
-
-//       {/* Media Details (Editable Fields) */}
-//       <TextField
-//         fullWidth
-//         label="Pseudo Name"
-//         name="pseudoName"
-//         value={formData.pseudoName}
-//         disabled
-//         sx={{ mb: 2 }}
-//       />
-//       <TextField
-//         fullWidth
-//         label="Title"
-//         name="title"
-//         value={formData.title || ""}
-//         onChange={handleChange}
-//         disabled={!editable}
-//         sx={{ mb: 2 }}
-//       />
-//       <TextField
-//         fullWidth
-//         label="Description"
-//         name="description"
-//         value={formData.description || ""}
-//         onChange={handleChange}
-//         disabled={!editable}
-//         sx={{ mb: 2 }}
-//       />
-//       {formData.eventName && (
-//         <TextField
-//           fullWidth
-//           label="Event Name"
-//           name="eventName"
-//           value={formData.eventName || ""}
-//           onChange={handleChange}
-//           disabled={!editable}
-//           sx={{ mb: 2 }}
-//         />
-//       )}
-//       {formData.eventLocation && (
-//         <TextField
-//           fullWidth
-//           label="Event Location"
-//           name="eventLocation"
-//           value={formData.eventLocation || ""}
-//           onChange={handleChange}
-//           disabled={!editable}
-//           sx={{ mb: 2 }}
-//         />
-//       )}
-
-//       {/* Media Rendering */}
-//       <Box sx={{ textAlign: "center", my: 2 }}>
-//         {formData.mediaType === "photos" && (
-//           <img
-//             src={formData.mediaPath}
-//             alt={formData.pseudoName}
-//             style={{ maxWidth: "100%", height: "auto", borderRadius: 8 }}
-//           />
-//         )}
-//         {formData.mediaType === "audios" && (
-//           <audio controls src={formData.mediaPath} style={{ width: "100%" }} />
-//         )}
-//         {formData.mediaType === "videos" && (
-//           <video
-//             controls
-//             src={formData.mediaPath}
-//             style={{ width: "100%", maxHeight: "400px" }}
-//           />
-//         )}
-//       </Box>
-
-//       {/* Timestamp Table (Editable) */}
-//       {(formData.mediaType === "audios" || formData.mediaType === "videos") && (
-//         <TableContainer component={Paper} sx={{ mt: 2 }}>
-//           <Typography variant="h6" sx={{ p: 2 }}>
-//             Timestamps
-//           </Typography>
-//           <Table>
-//             <TableHead>
-//               <TableRow>
-//                 <TableCell>Start Time</TableCell>
-//                 <TableCell>End Time</TableCell>
-//                 <TableCell>Content</TableCell>
-//                 {editable && <TableCell>Actions</TableCell>}
-//               </TableRow>
-//             </TableHead>
-//             <TableBody>
-//               {formData.timeStamp.map((time, index) => (
-//                 <TableRow key={index}>
-//                   <TableCell>
-//                     <TextField
-//                       type="number"
-//                       value={time.startTime || ""}
-//                       onChange={(e) =>
-//                         handleTimestampChange(
-//                           index,
-//                           "startTime",
-//                           e.target.value
-//                         )
-//                       }
-//                       disabled={!editable}
-//                     />
-//                   </TableCell>
-//                   <TableCell>
-//                     <TextField
-//                       type="number"
-//                       value={time.endTime || ""}
-//                       onChange={(e) =>
-//                         handleTimestampChange(index, "endTime", e.target.value)
-//                       }
-//                       disabled={!editable}
-//                     />
-//                   </TableCell>
-//                   <TableCell>
-//                     <TextField
-//                       fullWidth
-//                       value={time.content || ""}
-//                       onChange={(e) =>
-//                         handleTimestampChange(index, "content", e.target.value)
-//                       }
-//                       disabled={!editable}
-//                     />
-//                   </TableCell>
-//                   {editable && (
-//                     <TableCell>
-//                       <IconButton
-//                         onClick={() => removeTimestampRow(index)}
-//                         color="error"
-//                       >
-//                         <DeleteIcon />
-//                       </IconButton>
-//                     </TableCell>
-//                   )}
-//                 </TableRow>
-//               ))}
-//             </TableBody>
-//           </Table>
-//           {editable && (
-//             <Box sx={{ textAlign: "center", mt: 2 }}>
-//               <Button
-//                 onClick={addTimestampRow}
-//                 variant="contained"
-//                 startIcon={<AddIcon />}
-//               >
-//                 Add Timestamp
-//               </Button>
-//             </Box>
-//           )}
-//         </TableContainer>
-//       )}
-
-//       {/* Verify Button */}
-//       <Box sx={{ textAlign: "center", mt: 2 }}>
-//         <Button variant="contained" color="primary" onClick={handleVerify}>
-//           Verify
-//         </Button>
-//       </Box>
-//     </Box>
-//   );
-// };
-
-// const MediaDisplay = ({ media, handleClose }) => {
-//   const [editable, setEditable] = useState(false);
-//   const [formData, setFormData] = useState({
-//     ...media,
-//     timeStamp: media.timeStamp || [],
-//   });
-//   const [isTranscribing, setIsTranscribing] = useState(false);
-//   const [modalOpen, setModalOpen] = useState(false);
-//   const [selectedContent, setSelectedContent] = useState("");
-//   const [selectedIndex, setSelectedIndex] = useState(null);
-//   const videoRef = useRef(null);
-
-//   useEffect(() => {
-//     setFormData({ ...media, timeStamp: media.timeStamp || [] });
-//   }, [media]);
-
-//   const handleContentClick = (index, content, startTime, endTime) => {
-//     if (!editable) return;
-//     setSelectedContent(content);
-//     setSelectedIndex(index);
-//     setModalOpen(true);
-//     if (videoRef.current) {
-//       videoRef.current.currentTime = startTime;
-//       videoRef.current.loop = true;
-//       const loopInterval = setInterval(() => {
-//         if (
-//           videoRef.current.currentTime < startTime ||
-//           videoRef.current.currentTime >= endTime
-//         ) {
-//           videoRef.current.currentTime = startTime;
-//         }
-//       }, 500);
-//       return () => clearInterval(loopInterval);
-//     }
-//   };
-
-//   const handleModalSave = () => {
-//     const updatedTimestamps = formData.timeStamp.map((item, i) =>
-//       i === selectedIndex ? { ...item, content: selectedContent } : item
-//     );
-//     setFormData({ ...formData, timeStamp: updatedTimestamps });
-//     setModalOpen(false);
-//   };
-
-//   return (
-//     <Box sx={{ p: 2, border: "1px solid #ccc", borderRadius: 2, mb: 2 }}>
-//       <Box
-//         sx={{
-//           display: "flex",
-//           justifyContent: "space-between",
-//           alignItems: "center",
-//         }}
-//       >
-//         <Typography variant="h6">
-//           {editable ? "Edit Media" : "Media Details"}
-//         </Typography>
-//         <Box>
-//           <IconButton onClick={() => setEditable(!editable)}>
-//             {editable ? <SaveIcon color="primary" /> : <EditIcon />}
-//           </IconButton>
-//           <IconButton onClick={handleClose}>
-//             <CloseIcon />
-//           </IconButton>
-//         </Box>
-//       </Box>
-
-//       {media.mediaType === "videos" && (
-//         <video
-//           ref={videoRef}
-//           controls
-//           src={media.mediaPath}
-//           style={{ width: "100%", maxHeight: "400px" }}
-//         />
-//       )}
-
-//       {formData.timeStamp?.map((t) => (
-//         <span key={t.content}>{t.content}</span>
-//       ))}
-
-//       <TableContainer component={Paper} sx={{ mt: 2 }}>
-//         <Typography variant="h6" sx={{ p: 2 }}>
-//           Timestamps
-//         </Typography>
-//         <Table>
-//           <TableHead>
-//             <TableRow>
-//               <TableCell>Start Time</TableCell>
-//               <TableCell>End Time</TableCell>
-//               <TableCell>Content</TableCell>
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {formData.timeStamp.map((time, index) => (
-//               <TableRow key={index}>
-//                 <TableCell>{time.startTime}</TableCell>
-//                 <TableCell>{time.endTime}</TableCell>
-//                 <TableCell>
-//                   <TextField
-//                     fullWidth
-//                     value={time.content || ""}
-//                     onClick={() =>
-//                       handleContentClick(
-//                         index,
-//                         time.content,
-//                         time.startTime,
-//                         time.endTime
-//                       )
-//                     }
-//                     InputProps={{
-//                       readOnly: true,
-//                     }}
-//                     sx={{
-//                       cursor: editable ? "pointer" : "not-allowed",
-//                       "&:hover": editable ? { backgroundColor: "#f0f0f0" } : {},
-//                     }}
-//                   />
-//                 </TableCell>
-//               </TableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-
-//       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-//         <Box
-//           sx={{ p: 2, backgroundColor: "white", margin: "auto", width: "50%" }}
-//         >
-//           <Typography variant="h6">Edit Transcript</Typography>
-//           <TextField
-//             fullWidth
-//             multiline
-//             minRows={4}
-//             value={selectedContent}
-//             onChange={(e) => setSelectedContent(e.target.value)}
-//           />
-//           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-//             <Button variant="contained" onClick={handleModalSave}>
-//               Save
-//             </Button>
-//             <Button variant="outlined" onClick={() => setModalOpen(false)}>
-//               Cancel
-//             </Button>
-//           </Box>
-//         </Box>
-//       </Modal>
-//     </Box>
-//   );
-// };
-
-// const MediaDisplay = ({ media, handleClose }) => {
-//   const [editable, setEditable] = useState(false);
-//   const [formData, setFormData] = useState({
-//     ...media,
-//     timeStamp: media.timeStamp || [],
-//   });
-//   const [isTranscribing, setIsTranscribing] = useState(false);
-//   const [modalOpen, setModalOpen] = useState(false);
-//   const [selectedContent, setSelectedContent] = useState("");
-//   const [selectedIndex, setSelectedIndex] = useState(null);
-//   const [currentTime, setCurrentTime] = useState(0);
-//   const videoRef = useRef(null);
-
-//   useEffect(() => {
-//     setFormData({ ...media, timeStamp: media.timeStamp || [] });
-//   }, [media]);
-
-//   useEffect(() => {
-//     const interval = setInterval(() => {
-//       if (videoRef.current) {
-//         setCurrentTime(videoRef.current.currentTime);
-//       }
-//     }, 500);
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   const handleContentClick = (index, content, startTime, endTime) => {
-//     if (!editable) return;
-//     setSelectedContent(content);
-//     setSelectedIndex(index);
-//     setModalOpen(true);
-//     if (videoRef.current) {
-//       videoRef.current.currentTime = startTime;
-//       videoRef.current.loop = true;
-//       const loopInterval = setInterval(() => {
-//         if (
-//           videoRef.current.currentTime < startTime ||
-//           videoRef.current.currentTime >= endTime
-//         ) {
-//           videoRef.current.currentTime = startTime;
-//         }
-//       }, 500);
-//       return () => clearInterval(loopInterval);
-//     }
-//   };
-
-//   const handleModalSave = () => {
-//     const updatedTimestamps = formData.timeStamp.map((item, i) =>
-//       i === selectedIndex ? { ...item, content: selectedContent } : item
-//     );
-//     setFormData({ ...formData, timeStamp: updatedTimestamps });
-//     setModalOpen(false);
-//   };
-
-//   return (
-//     <Box sx={{ p: 2, border: "1px solid #ccc", borderRadius: 2, mb: 2 }}>
-//       <Box
-//         sx={{
-//           display: "flex",
-//           justifyContent: "space-between",
-//           alignItems: "center",
-//         }}
-//       >
-//         <Typography variant="h6">
-//           {editable ? "Edit Media" : "Media Details"}
-//         </Typography>
-//         <Box>
-//           <IconButton onClick={() => setEditable(!editable)}>
-//             {editable ? <SaveIcon color="primary" /> : <EditIcon />}
-//           </IconButton>
-//           <IconButton onClick={handleClose}>
-//             <CloseIcon />
-//           </IconButton>
-//         </Box>
-//       </Box>
-
-//       {media.mediaType === "videos" && (
-//         <video
-//           ref={videoRef}
-//           controls
-//           src={media.mediaPath}
-//           style={{ width: "100%", maxHeight: "400px" }}
-//         />
-//       )}
-
-//       <Box>
-//         {formData.timeStamp?.map((t) => (
-//           <span
-//             key={t.content}
-//             style={{
-//               fontWeight:
-//                 currentTime >= t.startTime && currentTime <= t.endTime
-//                   ? "bold"
-//                   : "normal",
-//               backgroundColor:
-//                 currentTime >= t.startTime && currentTime <= t.endTime
-//                   ? "yellow"
-//                   : "transparent",
-//               padding: "2px 5px",
-//               borderRadius: "4px",
-//             }}
-//           >
-//             {t.content}
-//           </span>
-//         ))}
-//       </Box>
-
-//       <TableContainer component={Paper} sx={{ mt: 2 }}>
-//         <Typography variant="h6" sx={{ p: 2 }}>
-//           Timestamps
-//         </Typography>
-//         <Table>
-//           <TableHead>
-//             <TableRow>
-//               <TableCell>Start Time</TableCell>
-//               <TableCell>End Time</TableCell>
-//               <TableCell>Content</TableCell>
-//             </TableRow>
-//           </TableHead>
-//           <TableBody>
-//             {formData.timeStamp.map((time, index) => (
-//               <TableRow key={index}>
-//                 <TableCell>{time.startTime}</TableCell>
-//                 <TableCell>{time.endTime}</TableCell>
-//                 <TableCell>
-//                   <TextField
-//                     fullWidth
-//                     value={time.content || ""}
-//                     onClick={() =>
-//                       handleContentClick(
-//                         index,
-//                         time.content,
-//                         time.startTime,
-//                         time.endTime
-//                       )
-//                     }
-//                     InputProps={{
-//                       readOnly: true,
-//                     }}
-//                     sx={{
-//                       cursor: editable ? "pointer" : "not-allowed",
-//                       "&:hover": editable ? { backgroundColor: "#f0f0f0" } : {},
-//                     }}
-//                   />
-//                 </TableCell>
-//               </TableRow>
-//             ))}
-//           </TableBody>
-//         </Table>
-//       </TableContainer>
-
-//       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-//         <Box
-//           sx={{ p: 2, backgroundColor: "white", margin: "auto", width: "50%" }}
-//         >
-//           <Typography variant="h6">Edit Transcript</Typography>
-//           <TextField
-//             fullWidth
-//             multiline
-//             minRows={4}
-//             value={selectedContent}
-//             onChange={(e) => setSelectedContent(e.target.value)}
-//           />
-//           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-//             <Button variant="contained" onClick={handleModalSave}>
-//               Save
-//             </Button>
-//             <Button variant="outlined" onClick={() => setModalOpen(false)}>
-//               Cancel
-//             </Button>
-//           </Box>
-//         </Box>
-//       </Modal>
-//     </Box>
-//   );
-// };
-
 const MediaDisplay = ({ media, handleClose }) => {
   const [editable, setEditable] = useState(false);
   const [formData, setFormData] = useState({
@@ -821,6 +243,23 @@ const MediaDisplay = ({ media, handleClose }) => {
     }, 500);
     return () => clearInterval(interval);
   }, []);
+
+  // 🔴 Format time in mm:ss
+  const formatTime = (seconds) => {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${min.toString().padStart(2, "0")}:${sec
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  // 🔴 Handle modal close
+  const handleModalClose = () => {
+    setModalOpen(false);
+    if (videoRef.current) {
+      videoRef.current.loop = false;
+    }
+  };
 
   const handleContentClick = (index, content, startTime, endTime) => {
     if (!editable) return;
@@ -872,103 +311,129 @@ const MediaDisplay = ({ media, handleClose }) => {
         </Box>
       </Box>
 
-      {media.mediaType === "videos" && (
+      {media?.mediaType === "videos" && (
         <video
           ref={videoRef}
           controls
-          src={media.mediaPath}
+          src={media?.mediaPath}
           style={{ width: "100%", maxHeight: "400px" }}
         />
       )}
 
       <Box>
-        {formData.timeStamp?.map((t) => (
-          <span
-            key={t.content}
-            style={{
-              fontWeight:
-                currentTime >= t.startTime && currentTime <= t.endTime
-                  ? "bold"
-                  : "normal",
-              backgroundColor:
-                currentTime >= t.startTime && currentTime <= t.endTime
-                  ? "yellow"
-                  : "transparent",
-              padding: "2px 5px",
-              borderRadius: "4px",
+        {(formData.mediaType === "audios" ||
+          formData.mediaType === "videos") && (
+          <TableContainer component={Paper} sx={{ mt: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                p: 2,
+              }}
+            >
+              <Typography variant="h6">Timestamps</Typography>
+            </Box>
+
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Start Time (mm:ss)</TableCell>
+                  <TableCell>End Time (mm:ss)</TableCell>
+                  <TableCell>Content</TableCell>
+                  {editable && <TableCell>Actions</TableCell>}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {formData.timeStamp?.map((time, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{formatTime(time.startTime)}</TableCell>
+                    <TableCell>{formatTime(time.endTime)}</TableCell>
+                    <TableCell>
+                      <div
+                        dangerouslySetInnerHTML={{ __html: time.content }}
+                        onClick={() =>
+                          editable && handleContentClick(index, time.content)
+                        }
+                        style={{
+                          cursor: editable ? "pointer" : "not-allowed",
+                          padding: "8px",
+                          borderRadius: "4px",
+                          border: editable ? "1px solid #ddd" : "none",
+                          backgroundColor: editable ? "#f9f9f9" : "transparent",
+                        }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+
+        {/* 🔴 Modal for Editing Content (ReactQuill for Rich Text Editing) */}
+        <Modal
+          open={modalOpen}
+          onClose={handleModalClose}
+          aria-labelledby="edit-content-modal"
+          aria-describedby="modal-to-edit-transcription-content"
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 500,
+              bgcolor: "background.paper",
+              border: "2px solid #000",
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 2,
             }}
           >
-            {t.content}
-          </span>
-        ))}
-      </Box>
-
-      <TableContainer component={Paper} sx={{ mt: 2 }}>
-        <Typography variant="h6" sx={{ p: 2 }}>
-          Timestamps
-        </Typography>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Start Time</TableCell>
-              <TableCell>End Time</TableCell>
-              <TableCell>Content</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {formData.timeStamp.map((time, index) => (
-              <TableRow key={index}>
-                <TableCell>{time.startTime}</TableCell>
-                <TableCell>{time.endTime}</TableCell>
-                <TableCell>
-                  <TextField
-                    fullWidth
-                    value={time.content || ""}
-                    onClick={() =>
-                      handleContentClick(
-                        index,
-                        time.content,
-                        time.startTime,
-                        time.endTime
-                      )
-                    }
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                    sx={{
-                      cursor: editable ? "pointer" : "not-allowed",
-                      "&:hover": editable ? { backgroundColor: "#f0f0f0" } : {},
-                    }}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Box
-          sx={{ p: 2, backgroundColor: "white", margin: "auto", width: "50%" }}
-        >
-          <Typography variant="h6">Edit Transcript</Typography>
-          <TextField
-            fullWidth
-            multiline
-            minRows={4}
-            value={selectedContent}
-            onChange={(e) => setSelectedContent(e.target.value)}
-          />
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-            <Button variant="contained" onClick={handleModalSave}>
-              Save
-            </Button>
-            <Button variant="outlined" onClick={() => setModalOpen(false)}>
-              Cancel
-            </Button>
+            <Typography id="edit-content-modal" variant="h6" sx={{ mb: 2 }}>
+              Edit Transcription Content
+            </Typography>
+            <ReactQuill
+              value={selectedContent}
+              onChange={setSelectedContent}
+              modules={{
+                toolbar: [
+                  [{ header: "1" }, { header: "2" }, { font: [] }],
+                  [{ list: "ordered" }, { list: "bullet" }],
+                  ["bold", "italic", "underline", "strike", "blockquote"],
+                  [{ align: [] }],
+                  [{ color: [] }, { background: [] }],
+                  ["clean"],
+                ],
+              }}
+            />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mt: 3,
+              }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleModalSave}
+              >
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleModalClose}
+              >
+                Cancel
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Modal>
+        </Modal>
+      </Box>
     </Box>
   );
 };

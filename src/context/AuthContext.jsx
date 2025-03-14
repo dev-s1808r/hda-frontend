@@ -26,15 +26,22 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       const decoded = decodeToken(token);
       if (decoded && decoded.exp * 1000 > Date.now()) {
-        setIsLoggedIn(true);
+        setLoading(true);
         setUser(decoded);
+        setIsLoggedIn(true);
+        setLoading(false);
       } else {
         localStorage.removeItem("t");
         setIsLoggedIn(false);
+        setLoading(false);
       }
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    validateToken();
+  }, []);
 
   // Logout function
   const logout = () => {
