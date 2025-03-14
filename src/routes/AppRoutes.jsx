@@ -23,7 +23,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route path="/login" Component={Auth} />
+      <Route path="/login" element={<Auth />} />
     </Routes>
   );
 }
