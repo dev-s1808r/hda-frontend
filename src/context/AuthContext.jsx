@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 // Create the Auth Context
 const AuthContext = createContext();
@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
+  const validateToken = () => {
     const token = localStorage.getItem("t");
     if (token) {
       const decoded = decodeToken(token);
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
       }
     }
     setLoading(false);
-  }, []);
+  };
 
   // Logout function
   const logout = () => {
@@ -44,8 +44,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, loading, logout }}>
-      {!loading && children}
+    <AuthContext.Provider
+      value={{ isLoggedIn, user, loading, logout, validateToken }}
+    >
+      {children}
     </AuthContext.Provider>
   );
 };

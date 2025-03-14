@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import AuthContext from "./AuthContext"; // Adjust the path to your AuthContext
+import AuthContext from "./AuthContext"; // Adjust the path
 
 const useAuth = () => {
   const context = useContext(AuthContext);

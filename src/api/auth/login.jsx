@@ -1,3 +1,4 @@
+import useAuth from "../../context/useAuth";
 import useAppStore from "../../store/useAppStore";
 import { api } from "../instance";
 

@@ -9,18 +9,13 @@ import {
   Paper,
   Grid,
 } from "@mui/material";
+import useAuth from "../context/useAuth";
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true); // Toggle between Login and Register
   const [loggedInUser, setLoggedInUser] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (loggedInUser) {
-      navigate("/");
-    }
-    setLoggedInUser(null);
-  }, [loggedInUser]);
+  const { validateToken } = useAuth();
 
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
@@ -33,8 +28,9 @@ function Auth() {
 
     try {
       const user = await login(data);
-      console.log(user);
+      validateToken();
       setLoggedInUser(user);
+      navigate("/");
     } catch (error) {
       console.error("Error during authentication:", error);
       alert(error);
