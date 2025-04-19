@@ -1,0 +1,79 @@
+.home {
+  overflow-y: auto;
+  display: flex;
+}
+
+.intro {
+  font-size: 18px;
+  margin-bottom: 24px;
+  max-width: 600px;
+  line-height: 175%;
+  padding: 24px 0;
+}
+
+.optionList {
+  list-style: none;
+  height: 100%;
+  width: 224px;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 24px;
+}
+
+.option {
+  font-size: 18px;
+  margin-bottom: 24px;
+  cursor: pointer;
+  padding: 8px 12px;
+  color: var(--greyText);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    var(--greyText),
+    red,
+    var(--greyText)
+  );
+  background-size: 200% 100%;
+  transition: background-position 0.5s ease, outline 0.3s ease;
+  border-radius: 4px;
+  max-width: fit-content;
+}
+
+/* Animation + outline on hover */
+.option:hover {
+  animation: pulseText 1s infinite;
+  outline: 1px solid var(--greyBorder);
+  outline-offset: 2px;
+}
+
+.stats {
+  padding: 24px 48px 0 0;
+}
+
+.statsIntro {
+  font-size: 18px;
+}
+
+.statsHeader {
+  max-width: fit-content;
+  max-height: fit-content;
+  outline: 1px solid var(--greyBorder);
+  padding: 24px;
+  background-color: whitesmoke;
+  border-radius: 8px;
+}
+
+/* Pulse animation */
+@keyframes pulseText {
+  0% {
+    background-position: 200% 0;
+  }
+  50% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}

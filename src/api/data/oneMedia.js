@@ -7,9 +7,12 @@ const useOneMedia = (id) => {
     isLoading: loadingMedia,
     refetch: refetchMedia,
   } = useFetchData({
-    queryKey: ["get-one-media"],
+    queryKey: ["get-one-media", id],
     url: `/media/media/${id}`,
+    refetchOnWindowFocus: true,
+    keepPreviousData: false,
   });
+
   return {
     media: media?.data,
     mediaError,

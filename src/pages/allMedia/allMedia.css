@@ -1,0 +1,18 @@
+.allMedia {
+  padding: 24px 48px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.allMedia {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+.allMedia::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.allMediaTable {
+  background-color: whitesmoke;
+  outline: 1px solid var(--greyBorder);
+}

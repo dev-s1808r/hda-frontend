@@ -28,6 +28,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 import useMediaForVerification from "../api/data/mediaForVerification";
 import ReactQuill from "react-quill";
+import useOneMedia from "../api/data/oneMedia";
+import useUpdateUserInfo from "../api/data/updateUserInfo";
+import useAuth from "../context/useAuth";
+import useAppStore from "../store/useAppStore";
+import MarkdownRenderer from "../components/Media/DownloadPdf";
 
 const MediaTabs = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -110,7 +115,7 @@ const MediaTable = ({ mediaType }) => {
 
   const handleMediaClick = (mediaItem) => {
     setSelectedMedia(null);
-    alert(`Media ID: ${mediaItem._id}`);
+    // alert(`Media ID: ${mediaItem._id}`);
     setSelectedMedia(mediaItem);
   };
 
@@ -244,6 +249,26 @@ const MediaDisplay = ({ media, handleClose }) => {
     return () => clearInterval(interval);
   }, []);
 
+  const userDetails = useAppStore.getState().user;
+
+  console.log(userDetails, "from verify");
+  const { media: newMedia, refetchMedia } = useOneMedia(
+    userDetails?.assignedMedia?._id
+  );
+
+  const handleMarkVerified = async (id) => {
+    // alert(id);
+    try {
+      let res = await api.patch("/media/mark-verified", {
+        mediaId: userDetails?.assignedMedia._id,
+      });
+      console.log(res.data, "updated media %%%%%");
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // 🔴 Format time in mm:ss
   const formatTime = (seconds) => {
     const min = Math.floor(seconds / 60);
@@ -259,6 +284,38 @@ const MediaDisplay = ({ media, handleClose }) => {
     if (videoRef.current) {
       videoRef.current.loop = false;
     }
+  };
+
+  const handleEditToggle = async () => {
+    if (editable && formData !== media) {
+      try {
+        const response = await api.patch(`/media/update-media`, {
+          formData,
+          mediaId: userDetails?.assignedMedia?._id,
+        });
+
+        if (response?.data?.updatedMedia) {
+          setFormData(response.data.updatedMedia);
+          refetchMedia();
+          console.log("Media updated:", response.data.updatedMedia);
+        } else {
+          console.warn("No updated media received from server");
+        }
+      } catch (error) {
+        console.error(
+          "Error updating media:",
+          error.response?.data?.message || error.message
+        );
+        alert("Failed to update media. Please try again.");
+      }
+    } else {
+      refetchMedia();
+    }
+    setEditable((prev) => !prev);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleContentClick = (index, content, startTime, endTime) => {
@@ -290,7 +347,16 @@ const MediaDisplay = ({ media, handleClose }) => {
   };
 
   return (
-    <Box sx={{ p: 2, border: "1px solid #ccc", borderRadius: 2, mb: 2 }}>
+    <Box
+      sx={{
+        p: 2,
+        border: "1px solid #ccc",
+        borderRadius: 2,
+        mb: 2,
+        maxWidth: "1080px",
+        marginRight: "16px",
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -301,8 +367,15 @@ const MediaDisplay = ({ media, handleClose }) => {
         <Typography variant="h6">
           {editable ? "Edit Media" : "Media Details"}
         </Typography>
+        <Button
+          sx={{ mb: 2 }}
+          variant="outlined"
+          onClick={() => handleMarkVerified(formData._id)}
+        >
+          Mark Verified
+        </Button>
         <Box>
-          <IconButton onClick={() => setEditable(!editable)}>
+          <IconButton onClick={handleEditToggle}>
             {editable ? <SaveIcon color="primary" /> : <EditIcon />}
           </IconButton>
           <IconButton onClick={handleClose}>
@@ -310,6 +383,34 @@ const MediaDisplay = ({ media, handleClose }) => {
           </IconButton>
         </Box>
       </Box>
+
+      <TextField
+        fullWidth
+        label="Pseudo Name"
+        name="pseudoName"
+        value={formData.pseudoName || ""}
+        disabled
+        sx={{ mb: 2 }}
+      />
+
+      <TextField
+        fullWidth
+        label="Title"
+        name="title"
+        value={formData.title || ""}
+        onChange={handleChange}
+        disabled={!editable}
+        sx={{ mb: 2 }}
+      />
+      <TextField
+        fullWidth
+        label="Description"
+        name="description"
+        value={formData.description || ""}
+        onChange={handleChange}
+        disabled={!editable}
+        sx={{ mb: 2 }}
+      />
 
       {media?.mediaType === "videos" && (
         <video
@@ -319,6 +420,8 @@ const MediaDisplay = ({ media, handleClose }) => {
           style={{ width: "100%", maxHeight: "400px" }}
         />
       )}
+
+      <MarkdownRenderer formData={formData} />
 
       <Box>
         {(formData.mediaType === "audios" ||

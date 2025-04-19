@@ -7,7 +7,7 @@ const useMedia = ({ type, page }) => {
     isLoading: loadingMedia,
     refetch: refetchMedia,
   } = useFetchData({
-    queryKey: ["get-all-media"],
+    queryKey: ["get-all-media", page],
     url: `/folders/scan-static?type=${type}&page=${page}`,
   });
 

@@ -2,4 +2,34 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "Noto Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-variation-settings: "wdth" 100;
+}
+
+:root {
+  --greyBackground: #f5f5f5;
+  --greyBorder: #e0e0e0;
+  --greyDark: #616161;
+  --greyText: #424242;
+}
+
+select {
+  font-size: 16px;
+  padding: 8px 8px;
+  border: 1px solid #616161;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* CAUTION: Internet Explorer hackery ahead */
+
+select::-ms-expand {
+  display: none; /* Remove default arrow in Internet Explorer 10 and 11 */
 }

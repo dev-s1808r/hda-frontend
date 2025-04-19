@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 export const api = axios.create({
   baseURL: "http://localhost:5000",
+  // baseURL: "/",
 });
 
 api.interceptors.request.use(

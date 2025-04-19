@@ -23,6 +23,7 @@ import { api } from "../../api/instance";
 import useOneMedia from "../../api/data/oneMedia";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import MarkdownRenderer from "./DownloadPdf";
 
 const MediaDisplay = ({
   handleMarkCompleted,
@@ -43,6 +44,8 @@ const MediaDisplay = ({
   const videoRef = useRef(null);
 
   const { media, refetchMedia } = useOneMedia(userDetails?.assignedMedia?._id);
+
+  console.log(media);
 
   useEffect(() => {
     if (media) {
@@ -287,6 +290,8 @@ const MediaDisplay = ({
           return <p key={c.content}>{c.content}</p>;
         })}
       </Box> */}
+
+      <MarkdownRenderer formData={formData} />
 
       {(formData.mediaType === "audios" || formData.mediaType === "videos") && (
         <TableContainer component={Paper} sx={{ mt: 2 }}>
