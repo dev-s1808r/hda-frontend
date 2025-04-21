@@ -73,6 +73,43 @@ const SubtitleEditor = ({
     }
   };
 
+  // const handleDownloadPDF = () => {
+  //   if (!formData?.timeStamp || formData.timeStamp.length === 0) {
+  //     alert("No subtitles to download.");
+  //     return;
+  //   }
+
+  //   const doc = new jsPDF();
+  //   const lineHeight = 10;
+  //   let y = 10;
+
+  //   doc.setFontSize(12);
+  //   doc.text(`Subtitle Transcript for ${formData.pseudoName}`, 10, y);
+  //   y += lineHeight;
+
+  //   formData.timeStamp.forEach((item, index) => {
+  //     const start = formatTime(item.startTime);
+  //     const end = formatTime(item.endTime);
+  //     const content = convert(item.content, {
+  //       wordwrap: 80,
+  //       selectors: [{ selector: "a", options: { ignoreHref: true } }],
+  //     });
+
+  //     const block = `${content}`;
+  //     const lines = doc.splitTextToSize(block, 180);
+
+  //     if (y + lines.length * lineHeight > 280) {
+  //       doc.addPage();
+  //       y = 10;
+  //     }
+
+  //     doc.text(lines, 10, y);
+  //     y += lines.length * lineHeight;
+  //   });
+
+  //   doc.save(`subtitles_${formData.pseudoName || "export"}.pdf`);
+  // };
+
   const handleDownloadPDF = () => {
     if (!formData?.timeStamp || formData.timeStamp.length === 0) {
       alert("No subtitles to download.");
@@ -84,27 +121,36 @@ const SubtitleEditor = ({
     let y = 10;
 
     doc.setFontSize(12);
-    doc.text(`Subtitle Transcript for ${formData.pseudoName}`, 10, y);
-    y += lineHeight * 2;
+    doc.setFont("helvetica", "bold"); // Make text bold
 
-    formData.timeStamp.forEach((item, index) => {
-      const start = formatTime(item.startTime);
-      const end = formatTime(item.endTime);
-      const content = convert(item.content, {
-        wordwrap: 80,
-        selectors: [{ selector: "a", options: { ignoreHref: true } }],
-      });
+    const headerText = `Subtitle Transcript for ${formData.pseudoName}`;
+    const headerLines = doc.splitTextToSize(headerText, 180); // Wrap if too long
+    doc.text(headerLines, 10, y); // Draw wrapped lines
+    y += headerLines.length * lineHeight;
 
-      const block = `(${start} - ${end})\n${content}\n`;
-      const lines = doc.splitTextToSize(block, 180);
+    // Reset to normal font for content
+    doc.setFont("helvetica", "normal");
 
-      if (y + lines.length * lineHeight > 280) {
+    const fullText = formData.timeStamp
+      .map((item) =>
+        convert(item.content, {
+          wordwrap: 80,
+          selectors: [{ selector: "a", options: { ignoreHref: true } }],
+        })
+          .replace(/\n+/g, " ")
+          .trim()
+      )
+      .join(" ");
+
+    const lines = doc.splitTextToSize(fullText, 180);
+
+    lines.forEach((line) => {
+      if (y > 280) {
         doc.addPage();
         y = 10;
       }
-
-      doc.text(lines, 10, y);
-      y += lines.length * lineHeight;
+      doc.text(line, 10, y);
+      y += lineHeight;
     });
 
     doc.save(`subtitles_${formData.pseudoName || "export"}.pdf`);
